@@ -50,7 +50,10 @@ Vue.component('movable-card', {
             :style=style
             @mousedown=mousedown
             @mousemove=mousemove
-            @mouseup=mouseup>
+            @mouseup=mouseup
+            @touchstart="ev => mousedown(ev.targetTouches[0])"
+            @touchmove="ev => mousemove(ev.targetTouches[0])"
+            @touchend="ev => mouseup(ev.targetTouches[0])">
 
             <slot :x=x :y=y />
         </div>
