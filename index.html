@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script src="https://unpkg.com/vue"></script>
+    <style>
+body {
+    margin: 0;
+    padding: 0;
+}
+main {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('https://source.unsplash.com/category/nature/1024x768');
+    overflow: hidden;
+}
+
+* {
+    user-select: none;
+}
+    </style>
+</head>
+
+<body>
+    <main>
+        <movable-card :x.sync=normal.x :y.sync=normal.y style="backgroundColor: white;">
+            normal
+        </movable-card>
+
+        <movable-card :x.sync=opacity.x :y.sync=opacity.y style="background-color: white; opacity: .6;">
+            opacity
+        </movable-card>
+
+        <movable-card :x.sync=inherit.x :y.sync=inherit.y style="background-image: inherit;">
+            inherit
+        </movable-card>
+
+        <movable-card :x.sync=frosted.x :y.sync=frosted.y style="background-image: inherit;">
+            <frosted-glass :x=frosted.x :y=frosted.y>
+                frosted-glass
+            </frosted-glass>
+        </movable-card>
+    </main>
+
+    <script>
+Vue.component('movable-card', {
+    props: ['x', 'y'],
+    template: `
+        <div
+            :style=style
+            @mousedown=mousedown
+            @mousemove=mousemove
+            @mouseup=mouseup>
+
+            <slot :x=x :y=y />
+        </div>
+    `,
+    data() {
+        return {
+            mouseX: null,
+            mouseY: null,
+        };
+    },
+    computed: {
+        style() {
+            return {
+                position: 'absolute',
+                top: `${this.y}px`,
+                left: `${this.x}px`,
+                border: '1px solid black',
+                width: '100px',
+                height: '100px',
+            };
+        },
+    },
+    methods: {
+        mousedown(ev) {
+            this.mouseX = ev.clientX;
+            this.mouseY = ev.clientY;
+        },
+        mousemove(ev) {
+            if (this.mouseX !== null && this.mouseY !== null) {
+                this.$emit('update:x', this.x + ev.clientX - this.mouseX);
+                this.$emit('update:y', this.y + ev.clientY - this.mouseY);
+                this.mouseX = ev.clientX;
+                this.mouseY = ev.clientY;
+            }
+        },
+        mouseup() {
+            this.mouseX = this.mouseY = null;
+        },
+    }
+});
+
+
+Vue.component('frosted-glass', {
+    props: ['x', 'y'],
+    template: `
+        <div style="width: 100%; height: 100%; background-image: inherit; position: relative; overflow: hidden;">
+            <div :style=style />
+            <div style="position: absolute; top: 0; left: 0; bottom: 0; right: 0;"><slot /></div>
+        </div>
+    `,
+    computed: {
+        style() {
+            return {
+                position: 'absolute',
+                top: '-5px',
+                left: '-5px',
+                bottom: '-5px',
+                right: '-5px',
+                backgroundImage: 'inherit',
+                backgroundPosition: `${-this.x + 5 - 1}px ${-this.y + 5 - 1}px`,  // - position + negative_margin_size(5px) - parent_border_size(1px)
+                filter: 'blur(5px)',
+            };
+        },
+    },
+});
+
+
+new Vue({
+    el: 'main',
+    data: () => ({
+        normal: {x: 10, y: 10},
+        opacity: {x: 120, y: 10},
+        inherit: {x: 230, y: 10},
+        frosted: {x: 340, y: 10},
+    }),
+});
+    </script>
+</body>
+</html>
