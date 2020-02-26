@@ -40,6 +40,10 @@ main {
                 frosted-glass
             </frosted-glass>
         </movable-card>
+
+        <div style="position: fixed; right: 0; bottom: 0; font-size: 1.4em; padding: .5em 2em; text-align: right; background-color: rgba(255, 255, 255, .8); border-radius: 8px 0 0 0;">
+            Drag box to move.
+        </div>
     </main>
 
     <script>
@@ -70,7 +74,7 @@ Vue.component('movable-card', {
                 position: 'absolute',
                 top: `${this.y}px`,
                 left: `${this.x}px`,
-                border: '1px solid black',
+                border: '1px solid red',
                 width: '100px',
                 height: '100px',
             };
